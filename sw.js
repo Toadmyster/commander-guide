@@ -1,5 +1,5 @@
 // Simple offline cache. Bump VERSION when you change files.
-const VERSION = "v1";
+const VERSION = "v2";
 const FILES = ["./", "index.html", "css/styles.css", "js/app.js", "js/config.js", "js/content.js",
   "manifest.webmanifest", "icons/icon.svg", "icons/icon-192.png", "icons/icon-512.png"];
 
