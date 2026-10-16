@@ -118,7 +118,7 @@
   }
   function updateProgress() {
     const { done, total, pct } = counts();
-    $("#ring").style.setProperty("--p", pct);
+    $("#homeBar").style.width = pct + "%";
     $("#ringPct").textContent = pct + "%";
     $("#progText").textContent = `${done} of ${total} complete`;
     $("#barFill").style.width = pct + "%";
