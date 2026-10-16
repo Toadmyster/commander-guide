@@ -26,6 +26,7 @@
       <button class="btn primary" type="submit">Continue</button>
     </form>
     <p class="fine">Your CAP ID is remembered on this device with a cookie.</p>
+    <p class="fine">Unofficial guide. Not an official product of, or endorsed by, Civil Air Patrol or the U.S. Air Force.</p>
   </div>
 </section>
 
@@ -52,13 +53,17 @@
           <p>Everything you need for your first days in command, in one place.</p>
         </div>
 
-        <div class="progress-card">
-          <div class="ring" id="ring"><span id="ringPct">0%</span></div>
-          <div>
-            <strong id="progText">0 of 0 complete</strong>
-            <small>Your checklist progress</small>
+        <button class="status" data-go="2" aria-label="View checklist progress">
+          <div class="status-row">
+            <span class="status-label">Checklist status</span>
+            <span class="status-pct" id="ringPct">0%</span>
           </div>
-        </div>
+          <div class="status-bar"><div id="homeBar"></div></div>
+          <div class="status-row">
+            <span id="progText">0 of 0 complete</span>
+            <span class="status-link">View checklist ›</span>
+          </div>
+        </button>
 
         <div class="actions">
           <button class="tile" data-go="1">
@@ -75,6 +80,7 @@
         <h3 class="section">CAP Online Resources</h3>
         <ul class="links" id="links"></ul>
         <p class="fine pad">Links open official CAP sites. Many require a CAP member login (eServices).</p>
+        <p class="disclaimer">This is an unofficial, volunteer-made guide. It is not an official product of Civil Air Patrol, is not endorsed by CAP or the U.S. Air Force, and does not replace CAP regulations or guidance from your chain of command. Always confirm requirements in current official CAP publications.</p>
       </section>
 
       <!-- 1 WELCOME -->
@@ -85,6 +91,7 @@
         </div>
         <article class="prose" id="welcome"></article>
         <button class="btn primary block" data-go="2">Go to Checklist</button>
+        <p class="disclaimer">Unofficial guide. Not an official product of, or endorsed by, Civil Air Patrol or the U.S. Air Force. Confirm all requirements in current official CAP publications.</p>
       </section>
 
       <!-- 2 CHECKLIST -->
