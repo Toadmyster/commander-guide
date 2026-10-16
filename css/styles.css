@@ -55,6 +55,19 @@ input:focus,textarea:focus{outline:none;border-color:var(--navy2);box-shadow:0 0
 .bar{height:8px;background:rgba(255,255,255,.2);border-radius:99px;margin:12px 0 6px;overflow:hidden}
 .bar div{height:100%;width:0;background:var(--gold);border-radius:99px;transition:width .4s}
 
+/* Status banner (tappable) */
+.status{display:block;width:100%;text-align:left;margin-bottom:12px;padding:12px 16px 12px 14px;cursor:pointer;
+  background:color-mix(in srgb,var(--gold) 14%,var(--card));border:0;border-left:5px solid var(--gold);border-radius:6px 12px 12px 6px}
+.status:active{filter:brightness(.96)}
+.status:focus-visible{outline:3px solid var(--navy2);outline-offset:2px}
+.status-row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:.85rem}
+.status-label{font-weight:700;text-transform:uppercase;letter-spacing:.06em;font-size:.72rem;color:var(--muted)}
+.status-pct{font-weight:800;font-size:1.1rem}
+.status-bar{height:6px;background:color-mix(in srgb,var(--text) 14%,transparent);border-radius:99px;margin:8px 0;overflow:hidden}
+.status-bar div{height:100%;width:0;background:var(--gold);border-radius:99px;transition:width .4s}
+.status-link{color:var(--red);font-weight:600}
+.disclaimer{font-size:.75rem;line-height:1.4;color:var(--muted);text-align:center;margin:22px 8px 4px;padding-top:14px;border-top:1px solid var(--line)}
+
 .progress-card,.card,.tile,.links li,.item{background:var(--card);border:1px solid var(--line);border-radius:var(--r)}
 .progress-card{display:flex;gap:16px;align-items:center;padding:14px 16px;margin-bottom:12px}
 .progress-card small{display:block;color:var(--muted)}
