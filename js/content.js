@@ -28,9 +28,9 @@ window.CONTENT = {
       { id: "g4", t: "Introduce yourself to the squadron", d: "Hold a first meeting and share your priorities." }
     ]},
     { name: "Learn the Rules", items: [
-      { id: "l1", t: "Review the regulation on CAP organization (CAPR 20-1)", d: "Understand command structure and responsibilities.", link: "https://www.gocivilairpatrol.com/members/publications/indexes-regulations-and-manuals-1700" },
+      { id: "l1", t: "Review key regulations for unit commanders", d: "Start with CAPR 35-5 (Officer and NCO Appointments and Promotions), CAPR 39-2 (Membership), CAPR 20-3 (Inspections and Compliance Analyses) and CAPR 35-1 (Assignment and Duty Status).", link: "https://www.gocivilairpatrol.com/members/publications/indexes-regulations-and-manuals-1700" },
       { id: "l2", t: "Review your wing's supplements and OIs", d: "Local rules can add to national ones.", link: "https://www.gocivilairpatrol.com/members/publications/approved-supplements-and-ois-by-region" },
-      { id: "l3", t: "Review cadet program and safety requirements", d: "Includes cadet protection and safety obligations for your unit." },
+      { id: "l3", t: "Review cadet program and protection requirements", d: "CAPR 60-1 (Cadet Program Management) and CAPR 60-2 (Cadet Protection Program).", link: "https://www.gocivilairpatrol.com/members/publications/indexes-regulations-and-manuals-1700" },
       { id: "l4", t: "Complete required commander training", d: "Check the Learning Management System and your wing for what applies to you." }
     ]},
     { name: "People & Staff", items: [
