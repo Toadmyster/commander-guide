@@ -4,6 +4,7 @@
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const CFG = window.APP_CONFIG || {};
   const C = window.CONTENT;
+  const PUB = window.PUB, DESK = window.DESK, LIB = window.LIBRARY;
 
   // ---------- storage helpers ----------
   const cookie = {
@@ -19,6 +20,19 @@
   let capId = "";
   let state = { done: {}, updated: 0 };
   const allItems = C.groups.flatMap(g => g.items);
+
+  // ---------- rich text: [[CAPR 39-2]], [[key|label]], **bold** ----------
+  const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  function rich(s) {
+    return esc(s)
+      .replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g, (m, key, label) => {
+        const url = PUB[key.trim()];
+        if (!url) { console.warn("Missing publication link:", key); return esc(label || key); }
+        return `<a class="plink" href="${url}" target="_blank" rel="noopener">${label || key}</a>`;
+      })
+      .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+  }
+  const plain = s => s.replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g, (m, k, l) => l || k).replace(/\*\*/g, "");
 
   // ---------- login ----------
   function start() {
@@ -42,7 +56,8 @@
     $("#sheetId").textContent = capId;
     loadLocal();
     renderAll();
-    go(0, false);
+    const h = location.hash.slice(1);
+    go(pages.includes(h) ? h : "home", false);
     await pull();
   }
 
@@ -69,7 +84,7 @@
       if (remote && remote.done && (remote.updated || 0) > (state.updated || 0)) {
         state = { done: remote.done, updated: remote.updated };
         ls.set(key(), JSON.stringify(state));
-        renderAll();
+        renderChecklist(); updateProgress();
       }
       setSync("Synced ✓");
     } catch (e) { setSync("Offline — saved on this device"); }
@@ -80,7 +95,6 @@
     clearTimeout(pushTimer);
     pushTimer = setTimeout(async () => {
       try {
-        // text/plain avoids a CORS preflight with Apps Script
         await fetch(CFG.SYNC_URL, { method: "POST", headers: { "Content-Type": "text/plain" },
           body: JSON.stringify({ id: capId, done: state.done, updated: state.updated }) });
         setSync("Synced ✓");
@@ -90,15 +104,103 @@
   function setSync(t) { $("#sync").textContent = t; }
 
   // ---------- rendering ----------
-  function renderAll() { renderWelcome(); renderLinks(); renderChecklist(); updateProgress(); }
-
-  function renderWelcome() { $("#welcome").innerHTML = C.welcome; }
+  function renderAll() {
+    $("#welcome").innerHTML = C.welcome;
+    renderLinks(); renderDesk(); renderLibrary();
+    renderChecklist(); updateProgress();
+  }
 
   function renderLinks() {
     $("#links").innerHTML = C.links.map(l =>
       `<li><a href="${l.u}" target="_blank" rel="noopener"><strong>${l.t} ↗</strong><small>${l.d}</small></a></li>`).join("");
   }
 
+  // ----- Desk guide -----
+  function renderDesk() {
+    $("#deskTitle").textContent = DESK.title;
+    $("#deskSub").textContent = DESK.subtitle;
+    $("#deskUpdated").textContent = DESK.updated;
+    $("#deskIntro").innerHTML = rich(DESK.intro);
+    $("#deskBody").innerHTML = DESK.sections.map(sec => {
+      let body = "";
+      if (sec.type === "top12") {
+        body = `<ol class="top12">` + sec.rows.map((r, i) =>
+          `<li><span class="num">${i + 1}</span><div><div class="t-pub">${rich(r[0])}</div><strong class="t-subj">${esc(r[1])}</strong><p class="t-why">${esc(r[2])}</p></div></li>`).join("") + `</ol>`;
+      } else if (sec.type === "bullets") {
+        body = `<ul class="bul">` + sec.items.map(t => `<li>${rich(t)}</li>`).join("") + `</ul>`;
+      } else if (sec.type === "rhythm") {
+        body = sec.rows.map(r => `<div class="rhythm"><span class="when">${esc(r[0])}</span><div><strong>${esc(r[1])}</strong><p>${esc(r[2])}</p></div></div>`).join("");
+      } else if (sec.type === "callout") {
+        body = `<div class="callout"><strong>${esc(sec.lead)}</strong><p>${esc(sec.text)}</p></div>`;
+      } else {
+        body = `<p class="para">${rich(sec.text)}</p>`;
+      }
+      return `<details class="acc"${sec.open ? " open" : ""}><summary>${esc(sec.title)}</summary><div class="acc-body">${body}</div></details>`;
+    }).join("");
+  }
+
+  // ----- Essential publications library -----
+  const kindOf = html => /^\s*<a[^>]*>CAPR/.test(html) ? "reg" : /^\s*<a[^>]*>CAWGP/.test(html) ? "cal" : "pam";
+  function pubCard(r, shelf) {
+    const num = rich(r[0]);
+    const q = (plain(r[0]) + " " + r[1] + " " + (r[2] || "")).toLowerCase();
+    return `<article class="pub k-${kindOf(num)} f-item" data-kind="${shelf}" data-q="${esc(q)}">
+      <div class="pub-num">${num}</div>
+      <h4>${esc(r[1])}</h4>${r[2] ? `<p>${esc(r[2])}</p>` : ""}
+      <span class="open-hint">Open PDF ↗</span></article>`;
+  }
+  function shelf(title, sub, inner, kind) {
+    return `<section class="shelf" data-shelf="${kind}"><h3 class="shelf-h"><span>${title}</span></h3>${sub ? `<p class="shelf-sub">${sub}</p>` : ""}${inner}</section>`;
+  }
+  function renderLibrary() {
+    $("#libTitle").textContent = LIB.title;
+    $("#libSub").textContent = LIB.subtitle;
+    $("#libUpdated").textContent = LIB.updated;
+    $("#libPurpose").innerHTML = rich(LIB.purpose);
+
+    const parts = [];
+    parts.push(shelf("1 · Core National Regulations", "", LIB.regs.map(r => pubCard(r, "reg")).join(""), "reg"));
+    parts.push(shelf("2 · Essential Commander Pamphlets and Guides", "", LIB.pamphlets.map(r => pubCard(r, "pam")).join(""), "pam"));
+    parts.push(shelf("3 · California Wing Publications", esc(LIB.calwingNote),
+      LIB.calwing.map(r => pubCard(r, "cal")).join(""), "cal"));
+    parts.push(shelf("4 · Recommended Commander Binder / Digital Folder", "",
+      `<ul class="bul dark">` + LIB.binder.map(t => `<li class="f-item" data-kind="all" data-q="${esc(plain(t).toLowerCase())}">${rich(t)}</li>`).join("") + `</ul>`, "all"));
+    parts.push(shelf("5 · Two Publications Worth Highlighting", "",
+      LIB.highlights.map(h => `<article class="feat f-item" data-kind="all" data-q="${esc((h.key + " " + h.title + " " + h.text).toLowerCase())}">
+        <div class="feat-star">★ Worth highlighting</div>
+        <h4>${rich("[[" + h.key + "]]")} — ${esc(h.title)}</h4><p>${esc(h.text)}</p></article>`).join(""), "all"));
+    parts.push(`<section class="shelf meta"><h3 class="shelf-h"><span>6 · Currency Note</span></h3><p class="note">${esc(LIB.currency)}</p></section>`);
+    parts.push(`<section class="shelf meta"><h3 class="shelf-h"><span>Official Reference Pages</span></h3><ul class="official">` +
+      LIB.official.map(o => `<li>${rich("[[" + o[1] + "|" + o[0] + " ↗]]")}</li>`).join("") + `</ul></section>`);
+    $("#libBody").innerHTML = parts.join("");
+    applyLibFilter();
+  }
+  let libF = "all";
+  function applyLibFilter() {
+    const q = $("#libSearch").value.trim().toLowerCase();
+    let any = false;
+    $$("#libBody .shelf:not(.meta)").forEach(sh => {
+      const kind = sh.dataset.shelf;
+      const kindOk = libF === "all" || kind === libF;
+      let vis = 0;
+      $$(".f-item", sh).forEach(it => {
+        const ok = kindOk && (!q || it.dataset.q.includes(q));
+        it.hidden = !ok; if (ok) vis++;
+      });
+      sh.hidden = vis === 0; if (vis) any = true;
+    });
+    $$("#libBody .meta").forEach(m => { m.hidden = !(libF === "all" && !q); });
+    $("#libEmpty").hidden = any;
+  }
+  $("#libSearch").addEventListener("input", applyLibFilter);
+  $("#chips").addEventListener("click", e => {
+    const b = e.target.closest(".chip"); if (!b) return;
+    libF = b.dataset.f;
+    $$("#chips .chip").forEach(c => c.classList.toggle("on", c === b));
+    applyLibFilter();
+  });
+
+  // ----- Checklist -----
   function renderChecklist() {
     $("#checklist").innerHTML = C.groups.map(g => {
       const n = g.items.filter(i => state.done[i.id]).length;
@@ -137,9 +239,10 @@
   function toggle(id) {
     if (state.done[id]) delete state.done[id]; else state.done[id] = new Date().toISOString().slice(0, 10);
     save();
-    const top = $$(".pane")[2].scrollTop;
+    const pane = $('.pane[data-page="checklist"]');
+    const top = pane.scrollTop;
     renderChecklist(); updateProgress();
-    $$(".pane")[2].scrollTop = top;
+    pane.scrollTop = top;
     if (navigator.vibrate) navigator.vibrate(8);
   }
 
@@ -179,22 +282,57 @@
 
   // ---------- navigation / swipe ----------
   const track = $("#track"), vp = $("#viewport");
-  const panes = $$(".pane"), N = panes.length;
-  let idx = 0;
+  const panes = $$(".pane");
+  const pages = panes.map(p => p.dataset.page);
+  const N = panes.length;
+  const welcomePage = $("#welcomePage");
+  let idx = 0, welcomeOpen = false;
+  track.style.width = (N * 100) + "%";
+  panes.forEach(p => { p.style.width = (100 / N) + "%"; });
 
-  function go(i, anim = true) {
+  function setHeader() {
+    const title = welcomeOpen ? "Welcome" : panes[idx].dataset.title;
+    $("#title").textContent = title;
+    $("#backBtn").hidden = !welcomeOpen;
+    $("#brandIcon").hidden = welcomeOpen;
+    const active = welcomeOpen ? "home" : pages[idx];
+    $$("#tabbar button").forEach(b => b.classList.toggle("on", b.dataset.go === active));
+  }
+  function openWelcome() {
+    welcomeOpen = true;
+    welcomePage.style.transform = ""; welcomePage.classList.remove("drag");
+    welcomePage.classList.add("open"); welcomePage.setAttribute("aria-hidden", "false");
+    welcomePage.scrollTop = 0;
+    setHeader();
+    try { history.replaceState(null, "", "#welcome"); } catch (e) {}
+  }
+  function closeWelcome() {
+    welcomeOpen = false;
+    welcomePage.classList.remove("drag"); welcomePage.style.transform = "";
+    welcomePage.classList.remove("open"); welcomePage.setAttribute("aria-hidden", "true");
+    setHeader();
+    try { history.replaceState(null, "", "#" + pages[idx]); } catch (e) {}
+  }
+  function go(name, anim = true) {
+    if (name === "welcome") { openWelcome(); return; }
+    let i = typeof name === "number" ? name : pages.indexOf(name);
+    if (i < 0) i = 0;
+    if (welcomeOpen) closeWelcome();
     idx = Math.max(0, Math.min(N - 1, i));
     track.classList.toggle("drag", !anim);
     track.style.transform = `translateX(${-idx * 100 / N}%)`;
-    $$("#tabbar button").forEach((b, n) => b.classList.toggle("on", n === idx));
-    $("#title").textContent = panes[idx].dataset.title;
     panes.forEach((p, n) => p.setAttribute("aria-hidden", n !== idx));
-    if (idx === 3) $("#preview").textContent = buildReport();
-    try { history.replaceState(null, "", "#" + idx); } catch (e) {}
+    setHeader();
+    if (pages[idx] === "report") $("#preview").textContent = buildReport();
+    try { history.replaceState(null, "", "#" + pages[idx]); } catch (e) {}
   }
   document.addEventListener("click", e => {
-    const b = e.target.closest("[data-go]"); if (b) { go(+b.dataset.go); panes[idx].scrollTop = 0; }
+    const b = e.target.closest("[data-go]"); if (!b) return;
+    const target = b.dataset.go;
+    go(target);
+    if (target !== "welcome") { const p = panes[idx]; if (p) p.scrollTop = 0; }
   });
+  $("#backBtn").addEventListener("click", closeWelcome);
 
   // finger-following swipe
   let sx = 0, sy = 0, dx = 0, dragging = false, locked = null, t0 = 0;
@@ -207,9 +345,14 @@
     const x = e.touches[0].clientX - sx, y = e.touches[0].clientY - sy;
     if (locked === null && (Math.abs(x) > 8 || Math.abs(y) > 8)) locked = Math.abs(x) > Math.abs(y) ? "h" : "v";
     if (locked !== "h") return;
+    if (welcomeOpen) {                      // swipe right to go back
+      dx = Math.max(0, x);
+      welcomePage.classList.add("drag");
+      welcomePage.style.transform = `translateX(${dx}px)`;
+      return;
+    }
     dx = x;
-    // rubber-band at the ends
-    if ((idx === 0 && dx > 0) || (idx === N - 1 && dx < 0)) dx *= 0.3;
+    if ((idx === 0 && dx > 0) || (idx === N - 1 && dx < 0)) dx *= 0.3;   // rubber-band at ends
     track.classList.add("drag");
     track.style.transform = `translateX(calc(${-idx * 100 / N}% + ${dx}px))`;
   }, { passive: true });
@@ -217,16 +360,26 @@
     if (!dragging) return; dragging = false;
     if (locked !== "h") return;
     const fast = Math.abs(dx) > 40 && Date.now() - t0 < 300;
+    if (welcomeOpen) {
+      if (dx > vp.clientWidth * 0.25 || (fast && dx > 0)) closeWelcome();
+      else { welcomePage.classList.remove("drag"); welcomePage.style.transform = ""; }
+      return;
+    }
     if (dx < -vp.clientWidth * 0.25 || (fast && dx < 0)) go(idx + 1);
     else if (dx > vp.clientWidth * 0.25 || (fast && dx > 0)) go(idx - 1);
     else go(idx);
   });
-  // keyboard / trackpad support for desktop
   document.addEventListener("keydown", e => {
     if (e.target.closest("input,textarea")) return;
-    if (e.key === "ArrowRight") go(idx + 1); if (e.key === "ArrowLeft") go(idx - 1);
+    if (welcomeOpen) { if (e.key === "ArrowLeft" || e.key === "Escape") closeWelcome(); return; }
+    if (e.key === "ArrowRight") go(idx + 1);
+    if (e.key === "ArrowLeft") go(idx - 1);
   });
-  window.addEventListener("hashchange", () => { const n = +location.hash.slice(1); if (!isNaN(n) && n !== idx) go(n); });
+  window.addEventListener("hashchange", () => {
+    const h = location.hash.slice(1);
+    if (h === "welcome" && !welcomeOpen) openWelcome();
+    else if (pages.includes(h) && (welcomeOpen || h !== pages[idx])) go(h);
+  });
 
   // ---------- account sheet ----------
   const sheet = (open) => { $("#sheet").hidden = $("#sheetBg").hidden = !open; };
@@ -247,7 +400,5 @@
   if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
     navigator.serviceWorker.register("sw.js").catch(() => {});
   }
-  const h = +location.hash.slice(1);
   start();
-  if (!isNaN(h) && h > 0 && capId) go(h, false);
 })();
