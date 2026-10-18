@@ -56,6 +56,8 @@ window.CONTENT = {
     { t: "CAP National Website", d: "News, programs, and member info", u: "https://www.gocivilairpatrol.com/" },
     { t: "eServices", d: "Member records, reports, and unit tools (login required)", u: "https://www.capnhq.gov/" },
     { t: "Regulations, Manuals & Indexes", d: "Official CAP publications index", u: "https://www.gocivilairpatrol.com/members/publications/indexes-regulations-and-manuals-1700" },
+    { t: "Pamphlets", d: "Official CAP pamphlets and guides index", u: "https://www.gocivilairpatrol.com/members/publications/pamphlets-1702/" },
+    { t: "Interim Change Letters (ICLs)", d: "Current changes to regulations", u: "https://www.gocivilairpatrol.com/members/publications/interim-change-letters-1708/" },
     { t: "Forms", d: "Official CAP forms", u: "https://www.gocivilairpatrol.com/members/publications/forms" },
     { t: "Approved Supplements & OIs by Region", d: "Local supplements to national regulations", u: "https://www.gocivilairpatrol.com/members/publications/approved-supplements-and-ois-by-region" },
     { t: "CAPipedia", d: "Member-built wiki for CAP procedures and how-tos", u: "https://capipedia.cap.gov/" }
