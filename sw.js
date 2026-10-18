@@ -1,6 +1,6 @@
 // Simple offline cache. Bump VERSION when you change files.
-const VERSION = "v3";
-const FILES = ["./", "index.html", "css/styles.css", "js/app.js", "js/config.js", "js/content.js",
+const VERSION = "v4";
+const FILES = ["./", "index.html", "css/styles.css", "js/app.js", "js/config.js", "js/content.js", "js/publications.js",
   "manifest.webmanifest", "icons/icon.svg", "icons/icon-192.png", "icons/icon-512.png"];
 
 self.addEventListener("install", e => {
