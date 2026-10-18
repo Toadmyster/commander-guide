@@ -174,12 +174,14 @@
 
     <!-- WELCOME: opens from the Home button only (slides in from the right) -->
     <section class="subpage" id="welcomePage" aria-hidden="true">
-      <div class="hero small">
+      <div class="hero small has-close">
+        <button class="close-x" data-go="home" aria-label="Close and return to Home">✕</button>
         <p class="eyebrow">Welcome</p>
         <h2>Welcome to Squadron Command</h2>
       </div>
       <article class="prose" id="welcome"></article>
       <button class="btn primary block" data-go="checklist">Go to Checklist</button>
+      <button class="btn ghost block" data-go="home">Close and Return Home</button>
       <p class="disclaimer">Unofficial guide. Not an official product of, or endorsed by, Civil Air Patrol or the U.S. Air Force. Confirm all requirements in current official CAP publications.</p>
     </section>
   </main>
