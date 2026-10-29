@@ -97,9 +97,6 @@ input:focus,textarea:focus{outline:none;border-color:var(--navy2);box-shadow:0 0
 .prose ul{padding-left:1.2rem}
 
 /* Checklist */
-.group{margin:18px 4px 8px;font-weight:700;color:var(--navy2);display:flex;justify-content:space-between}
-@media (prefers-color-scheme:dark){.group{color:#8fb3ff}}
-.group small{color:var(--muted);font-weight:500}
 .sync{font-size:.8rem;color:var(--muted);text-align:center;margin-bottom:6px}
 
 .card{padding:4px 16px 18px}
@@ -253,3 +250,30 @@ input:focus,textarea:focus{outline:none;border-color:var(--navy2);box-shadow:0 0
 .seg.na[aria-pressed="true"]{background:var(--muted);border-color:var(--muted);color:#fff}
 .ongoing{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:12px 16px}
 .ongoing .bul{font-size:.9rem}
+
+
+/* ===== Accordion sections + collapsed N/A cards ===== */
+.grp{margin-bottom:10px}
+.group{display:flex;align-items:center;gap:10px;width:100%;text-align:left;cursor:pointer;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px 14px;font-weight:700;color:var(--navy2);font-size:1rem}
+@media (prefers-color-scheme:dark){.group{color:#8fb3ff}}
+.grp.open .group{border-color:var(--navy2);border-bottom-left-radius:var(--r);box-shadow:0 2px 0 var(--navy2)}
+.g-name{flex:1}
+.g-count{font-size:.8rem;font-weight:700;padding:2px 10px;border-radius:99px;background:color-mix(in srgb,var(--muted) 18%,transparent);color:var(--muted)}
+.g-count.all{background:var(--ok);color:#fff}
+.group .chev{flex:none;width:9px;height:9px;margin:0 4px 3px 2px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);transition:transform .2s}
+.grp.open .group .chev{transform:rotate(225deg);margin-bottom:-3px}
+.g-body{padding-top:10px}
+.na-head{display:flex;gap:12px;align-items:center;width:100%;text-align:left;background:none;border:0;padding:10px 12px;cursor:pointer}
+.na-head .t{flex:1;min-width:0;font-weight:500;font-size:.92rem}
+.na-tag{flex:none;font-size:.62rem;font-weight:800;letter-spacing:.08em;color:var(--muted)}
+.na-head .chev{flex:none;width:9px;height:9px;margin:0 6px 3px 2px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);transition:transform .2s}
+.na-open .na-head .chev{transform:rotate(225deg);margin-bottom:-3px}
+.na-collapsed{opacity:.7}
+.na-body{padding:0 0 0 0}
+.na-desc{margin:0;padding:0 14px 0 50px}
+.na-badges{padding:0 14px 0 50px}
+.na-body .det{padding-top:4px}
+
+/* Ongoing reminders: always visible, outside the accordion */
+.sect-h{margin:20px 4px 8px;font-size:1rem;font-weight:700;color:var(--navy2)}
+@media (prefers-color-scheme:dark){.sect-h{color:#8fb3ff}}
