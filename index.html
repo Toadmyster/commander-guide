@@ -74,7 +74,7 @@
             <span class="ico">✓</span><span><strong>Checklist of Items to Complete</strong><small>Track your onboarding tasks</small></span><i>›</i>
           </button>
           <button class="tile" data-go="report">
-            <span class="ico">✉</span><span><strong>Send Progress Report</strong><small>Email your status to your wing or mentor</small></span><i>›</i>
+            <span class="ico">✉</span><span><strong>Send Progress Report</strong><small>Optional: share your status if your wing asks</small></span><i>›</i>
           </button>
           <button class="tile" data-go="desk">
             <span class="ico">
@@ -146,6 +146,7 @@
           <div class="bar"><div id="barFill"></div></div>
           <small id="barText"></small>
         </div>
+        <p class="legend" id="legend"></p>
         <div id="sync" class="sync"></div>
         <div id="checklist"></div>
       </section>
@@ -153,9 +154,10 @@
       <!-- REPORT -->
       <section class="pane" data-page="report" data-title="Report">
         <div class="hero small">
-          <p class="eyebrow">Progress Report</p>
+          <p class="eyebrow">Optional Progress Report</p>
           <h2>Send an Update</h2>
         </div>
+        <p class="lead">This report is optional. Send one if your group or wing asks for updates or you want to share your progress, and follow your local reporting expectations.</p>
         <form id="reportForm" class="card">
           <label for="toEmail">Send to (email address)</label>
           <input id="toEmail" type="email" placeholder="wing.cc@example.org" required>
