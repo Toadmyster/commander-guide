@@ -26,6 +26,7 @@ window.PUB = {
   "CAPR 173-1": M + "R173_001_F17766C8102F6.pdf",
   "CAPR 174-1": M + "ICL_2302_incorporated_to_CAPR_1741_2c70a4188e78f.pdf",
   "CAPR 190-1": M + "R190_001_70FAF7B447A02.pdf",
+  "CAPR 60-3":  M + "R060_003_075A4369FBA8E.pdf",   // Emergency Services Training and Operational Missions (26 Dec 12) - please verify current version
   // Pamphlets
   "CAPP 10-3":  M + "P010_003__18_Nov_2019_693CDB6E1DAC2.pdf",
   "CAPP 30-1":  M + "P_301_482AFDA40CDF8.pdf",
@@ -45,6 +46,10 @@ window.PUB = {
   "CAWGP 60-1-1": CAWG + "moduledocuments/embed/4426/CAWGP_6011__Guide_to_Cadet_Leadersh_56AC32C85AD6A.pdf",
   "CAWGP 60-1-3": CAWG + "moduledocuments/embed/4467/CAWGP_6013__Encampment_Addendum_9D929294AC92F.pdf",
   // Index / landing pages
+  "eServices": "https://www.capnhq.gov/",
+  "SUI information": "https://www.gocivilairpatrol.com/members/cap-national-hq/inspector-general/sui",
+  "Pacific Region supplements": NHQ + "approved-supplements-and-ois-by-region/pacific-regions-supplements-and-ois",
+  "CAP forms": NHQ + "forms/",
   "CAPR 160-series": NHQ + "indexes-regulations-and-manuals-1700/",
   "CAPR 20-series":  NHQ + "indexes-regulations-and-manuals-1700/",
   "CAPF 160-series": NHQ + "forms/",

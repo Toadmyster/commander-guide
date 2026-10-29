@@ -201,43 +201,83 @@
   });
 
   // ----- Checklist -----
+  // state.done[id] = "YYYY-MM-DD" (complete) or "NA" (not applicable); missing = open
+  const openDetails = new Set();
+  const statusOf = id => { const v = state.done[id]; return v === "NA" ? "na" : v ? "done" : "open"; };
+
+  function itemHtml(i) {
+    const st = statusOf(i.id);
+    const open = openDetails.has(i.id);
+    const badge = i.req
+      ? `<span class="badge req">Required</span><span class="badge-note">${esc(i.req)}</span>`
+      : `<span class="badge sug">Suggested</span>`;
+    const parts = [];
+    if (i.refs && i.refs.length) parts.push(`<div class="dt"><strong>Regulations &amp; links</strong><ul>${i.refs.map(r => `<li>${rich(r)}</li>`).join("")}</ul></div>`);
+    if (i.help) parts.push(`<div class="dt"><strong>Who can help</strong><p>${rich(i.help)}</p></div>`);
+    if (i.wing) parts.push(`<div class="dt"><strong>Wing-specific</strong><p>${rich(i.wing)}</p></div>`);
+    if (!parts.length) parts.push(`<div class="dt"><p>No additional details for this item.</p></div>`);
+    return `<div class="item st-${st}" data-id="${i.id}">
+      <button class="item-top" data-act="details" aria-expanded="${open}">
+        <span class="stat" aria-hidden="true"></span>
+        <span class="body"><span class="t">${esc(i.t)}</span><span class="badges">${badge}</span><span class="d">${esc(i.d)}</span></span>
+        <span class="chev" aria-hidden="true"></span>
+      </button>
+      <div class="det"${open ? "" : " hidden"}>${parts.join("")}</div>
+      <div class="acts">
+        <button class="seg done" data-act="done" aria-pressed="${st === "done"}">${st === "done" ? "✓ " : ""}Complete</button>
+        <button class="seg na" data-act="na" aria-pressed="${st === "na"}">${st === "na" ? "✓ " : ""}Not applicable</button>
+      </div>
+    </div>`;
+  }
+
   function renderChecklist() {
+    $("#legend").innerHTML = C.legend;
     $("#checklist").innerHTML = C.groups.map(g => {
       const n = g.items.filter(i => state.done[i.id]).length;
-      return `<div class="group">${g.name}<small>${n}/${g.items.length}</small></div>` +
-        g.items.map(i => `
-          <div class="item ${state.done[i.id] ? "done" : ""}" data-id="${i.id}" role="checkbox" tabindex="0" aria-checked="${!!state.done[i.id]}">
-            <div class="box"></div>
-            <div><span class="t">${i.t}</span><span class="d">${i.d || ""}</span>
-            ${i.link ? `<a href="${i.link}" target="_blank" rel="noopener">Open resource ↗</a>` : ""}</div>
-          </div>`).join("");
-    }).join("");
+      return `<div class="group">${esc(g.name)}<small>${n}/${g.items.length}</small></div>` + g.items.map(itemHtml).join("");
+    }).join("") +
+      `<div class="group">Ongoing reminders</div><div class="ongoing"><ul class="bul">${C.ongoing.map(t => `<li>${rich(t)}</li>`).join("")}</ul></div>`;
   }
 
   function counts() {
-    const done = allItems.filter(i => state.done[i.id]).length;
-    return { done, total: allItems.length, pct: Math.round(100 * done / allItems.length) };
+    const total = allItems.length;
+    const na = allItems.filter(i => state.done[i.id] === "NA").length;
+    const done = allItems.filter(i => state.done[i.id] && state.done[i.id] !== "NA").length;
+    const applicable = total - na;
+    return { done, na, total, applicable, pct: applicable ? Math.round(100 * done / applicable) : 0 };
+  }
+  function progressText() {
+    const { done, na, applicable } = counts();
+    return `${done} of ${applicable} complete` + (na ? ` · ${na} not applicable` : "");
   }
   function updateProgress() {
-    const { done, total, pct } = counts();
+    const { pct } = counts();
     $("#homeBar").style.width = pct + "%";
     $("#ringPct").textContent = pct + "%";
-    $("#progText").textContent = `${done} of ${total} complete`;
+    $("#progText").textContent = progressText();
     $("#barFill").style.width = pct + "%";
-    $("#barText").textContent = `${done} of ${total} complete`;
+    $("#barText").textContent = progressText();
     $("#preview").textContent = buildReport();
   }
 
   $("#checklist").addEventListener("click", e => {
     if (e.target.closest("a")) return;
-    const el = e.target.closest(".item"); if (!el) return;
-    toggle(el.dataset.id);
+    const btn = e.target.closest("[data-act]"); if (!btn) return;
+    const item = btn.closest(".item"); if (!item) return;
+    const id = item.dataset.id;
+    if (btn.dataset.act === "details") {
+      const det = $(".det", item);
+      det.hidden = !det.hidden;
+      btn.setAttribute("aria-expanded", String(!det.hidden));
+      if (det.hidden) openDetails.delete(id); else openDetails.add(id);
+    } else {
+      setStatus(id, btn.dataset.act);
+    }
   });
-  $("#checklist").addEventListener("keydown", e => {
-    if (e.key === " " || e.key === "Enter") { const el = e.target.closest(".item"); if (el) { e.preventDefault(); toggle(el.dataset.id); } }
-  });
-  function toggle(id) {
-    if (state.done[id]) delete state.done[id]; else state.done[id] = new Date().toISOString().slice(0, 10);
+  function setStatus(id, act) {
+    const cur = statusOf(id);
+    if (act === cur) delete state.done[id];                       // tap again to clear
+    else state.done[id] = act === "na" ? "NA" : new Date().toISOString().slice(0, 10);
     save();
     const pane = $('.pane[data-page="checklist"]');
     const top = pane.scrollTop;
@@ -248,18 +288,22 @@
 
   // ---------- report ----------
   function buildReport() {
-    const { done, total, pct } = counts();
+    const { done, na, applicable, pct } = counts();
     const name = $("#yourName").value.trim();
     const note = $("#note").value.trim();
     const lines = [
       "Squadron Commander Progress Report",
       `CAP ID: ${capId}` + (name ? `  |  ${name}` : ""),
       `Date: ${new Date().toLocaleDateString()}`,
-      `Progress: ${done} of ${total} (${pct}%)`, ""
+      `Progress: ${done} of ${applicable} complete (${pct}%)` + (na ? `, ${na} not applicable` : ""), ""
     ];
     C.groups.forEach(g => {
       lines.push(g.name.toUpperCase());
-      g.items.forEach(i => lines.push(`  [${state.done[i.id] ? "x" : " "}] ${i.t}` + (state.done[i.id] ? ` (${state.done[i.id]})` : "")));
+      g.items.forEach(i => {
+        const v = state.done[i.id];
+        const mark = v === "NA" ? "N/A" : v ? "x" : " ";
+        lines.push(`  [${mark}] ${i.t}` + (i.req ? " (Required)" : "") + (v && v !== "NA" ? ` (${v})` : ""));
+      });
       lines.push("");
     });
     if (note) lines.push("Notes: " + note, "");
