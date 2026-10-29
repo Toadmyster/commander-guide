@@ -67,6 +67,7 @@
     try { state = JSON.parse(ls.get(key())) || { done: {}, updated: 0 }; } catch (e) { state = { done: {}, updated: 0 }; }
     $("#toEmail").value = ls.get("cap_report_to") || CFG.DEFAULT_REPORT_EMAIL || "";
     $("#yourName").value = ls.get("cap_report_name") || "";
+    openGroup = ls.get(groupKey()) || "";
   }
   function save() {
     state.updated = Date.now();
@@ -202,41 +203,77 @@
 
   // ----- Checklist -----
   // state.done[id] = "YYYY-MM-DD" (complete) or "NA" (not applicable); missing = open
-  const openDetails = new Set();
+  const openDetails = new Set();      // items whose details drawer is open
+  const naExpanded = new Set();       // not-applicable items the user expanded
+  let openGroup = "";                 // accordion: key of the open section ("" = all collapsed)
+  const groupKey = () => "cap_open_group_" + capId;
   const statusOf = id => { const v = state.done[id]; return v === "NA" ? "na" : v ? "done" : "open"; };
 
-  function itemHtml(i) {
-    const st = statusOf(i.id);
-    const open = openDetails.has(i.id);
-    const badge = i.req
-      ? `<span class="badge req">Required</span><span class="badge-note">${esc(i.req)}</span>`
-      : `<span class="badge sug">Suggested</span>`;
+  function detailParts(i) {
     const parts = [];
     if (i.refs && i.refs.length) parts.push(`<div class="dt"><strong>Regulations &amp; links</strong><ul>${i.refs.map(r => `<li>${rich(r)}</li>`).join("")}</ul></div>`);
     if (i.help) parts.push(`<div class="dt"><strong>Who can help</strong><p>${rich(i.help)}</p></div>`);
     if (i.wing) parts.push(`<div class="dt"><strong>Wing-specific</strong><p>${rich(i.wing)}</p></div>`);
     if (!parts.length) parts.push(`<div class="dt"><p>No additional details for this item.</p></div>`);
+    return parts.join("");
+  }
+  function actsHtml(st) {
+    return `<div class="acts">
+        <button class="seg done" data-act="done" aria-pressed="${st === "done"}">${st === "done" ? "✓ " : ""}Complete</button>
+        <button class="seg na" data-act="na" aria-pressed="${st === "na"}">${st === "na" ? "✓ " : ""}Not applicable</button>
+      </div>`;
+  }
+
+  function itemHtml(i) {
+    const st = statusOf(i.id);
+    const badge = i.req
+      ? `<span class="badge req">Required</span><span class="badge-note">${esc(i.req)}</span>`
+      : `<span class="badge sug">Suggested</span>`;
+
+    if (st === "na") {
+      // Collapsed by default to just the crossed-out title; tap to expand (e.g. if marked in error)
+      const open = naExpanded.has(i.id);
+      return `<div class="item st-na ${open ? "na-open" : "na-collapsed"}" data-id="${i.id}">
+        <button class="na-head" data-act="naToggle" aria-expanded="${open}">
+          <span class="stat" aria-hidden="true"></span>
+          <span class="t">${esc(i.t)}</span>
+          <span class="na-tag">N/A</span>
+          <span class="chev" aria-hidden="true"></span>
+        </button>
+        ${open ? `<div class="na-body"><p class="d na-desc">${esc(i.d)}</p><div class="badges na-badges">${badge}</div><div class="det">${detailParts(i)}</div>${actsHtml(st)}</div>` : ""}
+      </div>`;
+    }
+
+    const open = openDetails.has(i.id);
     return `<div class="item st-${st}" data-id="${i.id}">
       <button class="item-top" data-act="details" aria-expanded="${open}">
         <span class="stat" aria-hidden="true"></span>
         <span class="body"><span class="t">${esc(i.t)}</span><span class="badges">${badge}</span><span class="d">${esc(i.d)}</span></span>
         <span class="chev" aria-hidden="true"></span>
       </button>
-      <div class="det"${open ? "" : " hidden"}>${parts.join("")}</div>
-      <div class="acts">
-        <button class="seg done" data-act="done" aria-pressed="${st === "done"}">${st === "done" ? "✓ " : ""}Complete</button>
-        <button class="seg na" data-act="na" aria-pressed="${st === "na"}">${st === "na" ? "✓ " : ""}Not applicable</button>
-      </div>
+      <div class="det"${open ? "" : " hidden"}>${detailParts(i)}</div>
+      ${actsHtml(st)}
     </div>`;
+  }
+
+  function groupHtml(key, name, count, inner) {
+    const open = openGroup === key;
+    return `<section class="grp${open ? " open" : ""}" data-g="${key}">
+      <button class="group" data-act="group" aria-expanded="${open}">
+        <span class="g-name">${esc(name)}</span>${count ? `<span class="g-count${count.all ? " all" : ""}">${count.text}</span>` : ""}
+        <span class="chev" aria-hidden="true"></span>
+      </button>
+      <div class="g-body"${open ? "" : " hidden"}>${inner}</div>
+    </section>`;
   }
 
   function renderChecklist() {
     $("#legend").innerHTML = C.legend;
-    $("#checklist").innerHTML = C.groups.map(g => {
+    $("#checklist").innerHTML = C.groups.map((g, gi) => {
       const n = g.items.filter(i => state.done[i.id]).length;
-      return `<div class="group">${esc(g.name)}<small>${n}/${g.items.length}</small></div>` + g.items.map(itemHtml).join("");
+      return groupHtml(String(gi), g.name, { text: `${n}/${g.items.length}`, all: n === g.items.length }, g.items.map(itemHtml).join(""));
     }).join("") +
-      `<div class="group">Ongoing reminders</div><div class="ongoing"><ul class="bul">${C.ongoing.map(t => `<li>${rich(t)}</li>`).join("")}</ul></div>`;
+      `<h3 class="sect-h">Ongoing reminders</h3><div class="ongoing"><ul class="bul">${C.ongoing.map(t => `<li>${rich(t)}</li>`).join("")}</ul></div>`;
   }
 
   function counts() {
@@ -263,26 +300,59 @@
   $("#checklist").addEventListener("click", e => {
     if (e.target.closest("a")) return;
     const btn = e.target.closest("[data-act]"); if (!btn) return;
+    const act = btn.dataset.act;
+
+    if (act === "group") {                                   // accordion section header
+      const grp = btn.closest(".grp");
+      setOpenGroup(grp.classList.contains("open") ? "" : grp.dataset.g, true);
+      return;
+    }
     const item = btn.closest(".item"); if (!item) return;
     const id = item.dataset.id;
-    if (btn.dataset.act === "details") {
+    if (act === "details") {
       const det = $(".det", item);
       det.hidden = !det.hidden;
       btn.setAttribute("aria-expanded", String(!det.hidden));
       if (det.hidden) openDetails.delete(id); else openDetails.add(id);
+    } else if (act === "naToggle") {                         // expand/collapse a not-applicable card
+      if (naExpanded.has(id)) naExpanded.delete(id); else naExpanded.add(id);
+      rerenderKeepScroll();
     } else {
-      setStatus(id, btn.dataset.act);
+      setStatus(id, act);
     }
   });
-  function setStatus(id, act) {
-    const cur = statusOf(id);
-    if (act === cur) delete state.done[id];                       // tap again to clear
-    else state.done[id] = act === "na" ? "NA" : new Date().toISOString().slice(0, 10);
-    save();
+  function setOpenGroup(key, scroll) {
+    openGroup = key;
+    ls.set(groupKey(), key);
+    $$("#checklist .grp").forEach(g => {
+      const open = g.dataset.g === key;
+      g.classList.toggle("open", open);
+      $(".group", g).setAttribute("aria-expanded", String(open));
+      $(".g-body", g).hidden = !open;
+    });
+    if (scroll && key) {
+      const g = $(`#checklist .grp[data-g="${key}"]`);
+      if (g) setTimeout(() => {
+        // scroll only the checklist pane (scrollIntoView would also shift the sliding viewport sideways)
+        const pane = $('.pane[data-page="checklist"]');
+        const top = g.getBoundingClientRect().top - pane.getBoundingClientRect().top + pane.scrollTop - 8;
+        pane.scrollTo({ top, behavior: "smooth" });
+      }, 30);
+    }
+  }
+  function rerenderKeepScroll() {
     const pane = $('.pane[data-page="checklist"]');
     const top = pane.scrollTop;
     renderChecklist(); updateProgress();
     pane.scrollTop = top;
+  }
+  function setStatus(id, act) {
+    const cur = statusOf(id);
+    if (act === cur) delete state.done[id];                       // tap again to clear
+    else state.done[id] = act === "na" ? "NA" : new Date().toISOString().slice(0, 10);
+    naExpanded.delete(id);                                        // a card marked N/A starts collapsed
+    save();
+    rerenderKeepScroll();
     if (navigator.vibrate) navigator.vibrate(8);
   }
 
