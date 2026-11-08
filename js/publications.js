@@ -44,7 +44,9 @@ window.PUB = {
   // California Wing
   "CAWGP 39-2-1": CAWG + "moduledocuments/embed/4115/CAWGP_3921__Recruiting_at_Schools_AAA7CA58B8DFA.pdf",
   "CAWGP 60-1-1": CAWG + "moduledocuments/embed/4426/CAWGP_6011__Guide_to_Cadet_Leadersh_56AC32C85AD6A.pdf",
+  "CAWGP 60-1-2": CAWG + "moduledocuments/embed/4675/DRAFT_CAWGP_6012_7B911B1BC81BB.pdf", // TEMP: draft file; replace with official link
   "CAWGP 60-1-3": CAWG + "moduledocuments/embed/4467/CAWGP_6013__Encampment_Addendum_9D929294AC92F.pdf",
+  "CAWGP 60-1-5": CAWG + "moduledocuments/embed/4676/DRAFT_CAWGP_6015_9103BA7641F72.pdf", // TEMP: draft file; replace with official link
   // Index / landing pages
   "CAPF 172": M + "capf172_609056EC197EC_5AC1BF8B25A6B.pdf",
   "ES training": "https://www.gocivilairpatrol.com/programs/emergency-services/education-and-training/",
@@ -111,6 +113,7 @@ window.DESK = {
       "Start with [[CAPR 60-1]] and [[CAPR 60-2]] for cadet-program and protection requirements.",
       "If serving in California Wing, consult [[CAWGP 60-1-1]] early for cadet leadership training events — before dates, facilities, staff, or registration are treated as final.",
       "For California Wing encampment matters, also consult [[CAWGP 60-1-3]].",
+      "California Wing's Integrated Leadership Program schools are covered by addenda to [[CAWGP 60-1-1]]: [[CAWGP 60-1-2]] (Airman Development School, for Curry-level cadets before encampment) and [[CAWGP 60-1-5]] (NCO School, for C/SSgts and above after encampment). The usual sequence is ADS, then encampment, then DCS and NCOS in either order. These California Wing pamphlets are nondirective guidance, not requirements.",
       "Use current risk-management/safety publications and the appropriate [[CAPF 160-series]] documentation.",
       "Confirm the approval chain, project officer, finance, transportation, medical/emergency planning, supervision, Registration Zone requirements, and after-action responsibilities."
     ]},
@@ -138,7 +141,7 @@ window.DESK = {
       "**1 — COMMAND:** [[CAPR 30-1]]; [[CAPP 40-2]]; [[CAPP 30-1]]; [[CAPP 10-3]]; command goals and continuity.",
       "**2 — MEMBERSHIP:** [[CAPR 39-2]]; [[CAPP 60-14]] First Talk; recruiting/onboarding checklists.",
       "**3 — CADET PROGRAMS:** [[CAPR 60-1]]; [[CAPR 60-2]]; [[CAPP 60-20]]; [[CAPP 60-21]] Great Start; staff/CAC/drill references.",
-      "**4 — WING & REGION:** current wing and region supplements, OIs, forms, and chain-of-command guidance. California Wing commanders should include [[CAWGP 60-1-1]] and [[CAWGP 60-1-3]].",
+      "**4 — WING & REGION:** current wing and region supplements, OIs, forms, and chain-of-command guidance. California Wing commanders should include [[CAWGP 60-1-1]] and its addenda [[CAWGP 60-1-2]], [[CAWGP 60-1-3]] and [[CAWGP 60-1-5]].",
       "**5 — SAFETY:** current [[CAPR 160-series]] references; risk assessments; safety records.",
       "**6 — FINANCE & PROPERTY:** [[CAPR 173-1]]; [[CAPR 174-1]]; budget, finance records, inventory/custody.",
       "**7 — IG / SUI:** [[CAPR 20-series]]; inspection worksheets; continuously maintained evidence.",
@@ -148,7 +151,7 @@ window.DESK = {
       lead: "Know where the answer is; you do not have to memorize every answer.",
       text: "For recurring squadron functions, build simple local checklists that point back to the governing regulation. When a question involves membership, cadet protection, safety, finance, property, discipline, or a significant activity, check the current publication and any ICL/supplement before acting." },
     { title: "Publication Currency — 21 September 2026", type: "para",
-      text: "NHQ currently lists 2026 Interim Change Letters affecting [[CAPR 30-1]], [[CAPR 39-1]], [[CAPR 39-2]], [[CAPR 40-1]], [[CAPR 160-2]], [[CAPR 174-1]] and other publications. Maintain links to the official [[NHQ regulations index|NHQ and applicable wing publication indexes]] instead of relying only on downloaded PDFs." }
+      text: "NHQ currently lists 2026 Interim Change Letters affecting [[CAPR 30-1]], [[CAPR 39-1]], [[CAPR 39-2]], [[CAPR 40-1]], [[CAPR 160-2]], [[CAPR 174-1]] and other publications. Maintain links to the official [[NHQ regulations index|NHQ and applicable wing publication indexes]] instead of relying only on downloaded PDFs. California Wing published [[CAWGP 60-1-2]] and [[CAWGP 60-1-5]] on 5 November 2026 (CAPR 1-2 ICL 26-10); they replace any earlier drafts or unofficial ADS, NCOS, APS, BCS or ATS training documents. Their links here currently point to the wing's draft files until the official versions are posted." }
   ]
 };
 
@@ -193,8 +196,10 @@ window.LIBRARY = {
   ],
 
   calwing: [
-    ["[[CAWGP 60-1-1]]", "Guide to Cadet Leadership Training Events", "Essential for planning California Wing cadet leadership activities and weekend/overnight training events."],
-    ["[[CAWGP 60-1-3]]", "Encampment Addendum to CAWGP 60-1-1", ""],
+    ["[[CAWGP 60-1-1]]", "Guide to Cadet Leadership Training Events", "Parent guide for California Wing cadet leadership activities and weekend/overnight training events; the addenda below build on it."],
+    ["[[CAWGP 60-1-2]]", "Airman Development School Addendum to CAWGP 60-1-1", "Pre-encampment weekend school for cadets who have earned the Curry Award. Nondirective guidance (5 Nov 2026)."],
+    ["[[CAWGP 60-1-3]]", "Encampment Addendum to CAWGP 60-1-1", "California Wing encampment guidance."],
+    ["[[CAWGP 60-1-5]]", "Non-Commissioned Officer School Addendum to CAWGP 60-1-1", "Phase II school for cadets who have attended encampment and hold C/SSgt or above (waivers possible). Nondirective guidance (5 Nov 2026)."],
     ["[[CAWGP 39-2-1]]", "Recruiting at Schools", "Where applicable."]
   ],
   calwingNote: "Applicable CAWG supplements, operating instructions, forms, and Group directives. Always check the current CAWG and NHQ approved-publications pages rather than relying on an old local copy.",
@@ -203,7 +208,7 @@ window.LIBRARY = {
     "**COMMAND** — [[CAPR 30-1]]; [[CAPP 40-2]]; [[CAPP 30-1]]; [[CAPP 10-3]].",
     "**MEMBERSHIP & PERSONNEL** — [[CAPR 35-1]]; [[CAPR 39-2]]; [[CAPR 39-3]]; [[CAPR 40-1]]; [[CAPP 60-14]] First Talk Guide.",
     "**CADET PROGRAMS** — [[CAPR 60-1]]; [[CAPR 60-2]]; [[CAPP 60-18]]; [[CAPP 60-20]]; [[CAPP 60-21]] Great Start; staff/CAC/drill guides.",
-    "**CALIFORNIA WING** — [[CAWGP 60-1-1]]; [[CAWGP 60-1-3]]; [[NHQ supplements and OIs|applicable CAWG supplements/OIs/forms]].",
+    "**CALIFORNIA WING** — [[CAWGP 60-1-1]]; [[CAWGP 60-1-2]]; [[CAWGP 60-1-3]]; [[CAWGP 60-1-5]]; [[NHQ supplements and OIs|applicable CAWG supplements/OIs/forms]].",
     "**SAFETY & HEALTH** — current [[CAPR 160-series]] publications, risk-management tools, and [[CAPF 160-series]] forms used for activities.",
     "**FINANCE & PROPERTY** — [[CAPR 173-1]]; [[CAPR 174-1]]; local finance/property records.",
     "**IG / SUI** — [[CAPR 20-1]]; [[CAPR 20-2|20-2]]; [[CAPR 20-3|20-3]]; current inspection worksheets and evidence files.",
@@ -217,7 +222,7 @@ window.LIBRARY = {
       text: "A comprehensive onboarding program for prospective/new cadets. NHQ describes its objective as moving a new cadet toward C/Amn in roughly five weeks. It should be the backbone of a repeatable Squadron 68 new-cadet intake process." }
   ],
 
-  currency: "CAP publications change frequently. As of 18 September 2026, NHQ lists 2026 Interim Change Letters affecting, among others, CAPR 30-1, 39-1, 39-2, 40-1, 160-2, and 174-1. Before making a command decision, verify the current parent regulation, all incorporated or attached ICLs, and applicable California Wing supplements/OIs.",
+  currency: "CAP publications change frequently. As of 18 September 2026, NHQ lists 2026 Interim Change Letters affecting, among others, CAPR 30-1, 39-1, 39-2, 40-1, 160-2, and 174-1. Before making a command decision, verify the current parent regulation, all incorporated or attached ICLs, and applicable California Wing supplements/OIs. California Wing's CAWGP 60-1-2 (ADS) and 60-1-5 (NCOS) were published 5 November 2026; discard earlier drafts or unofficial versions.",
 
   official: [
     ["National Headquarters: Regulations & Manuals", "NHQ regulations index"],
