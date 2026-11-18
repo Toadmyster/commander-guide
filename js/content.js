@@ -106,6 +106,7 @@ window.CONTENT = {
         help: "The finance committee and the outgoing commander." },
       { id: "d4", t: "Conduct the changeover property inventory",
         d: "Work with the property officer using the ORMS changeover process, reconcile discrepancies, and confirm responsibility for applicable property.",
+        req: "",
         refs: ["[[CAPR 174-1]] — Property Management and Accountability", "[[CAPP 40-2]] (recommends a changeover inventory within the first 30 days)"],
         help: "Your property/logistics officer and wing logistics staff." },
       { id: "d5", t: "Review staff assignments and coverage",
